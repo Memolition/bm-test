@@ -11,16 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('registry', function (Blueprint $table) {
+        Schema::create('reports', function (Blueprint $table) {
             $table->id();
-            $table->datetime('inAt')->nullable(false);
-            $table->datetime('outAt')->nullable(true)->default(null);
-            $table->unsignedBigInteger('carId');
             $table->unsignedBigInteger('userId');
 
-            $table->foreign('carId')->references('id')->on('cars');
             $table->foreign('userId')->references('id')->on('users');
-
             $table->timestamps();
         });
     }
@@ -30,10 +25,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('cars', function (Blueprint $table) {
+        Schema::table('reports', function (Blueprint $table) {
             $table->dropForeign('registry_users_userid_foreign');
-            $table->dropForeign('registry_cars_carid_foreign');
         });
-        Schema::dropIfExists('registries');
+        Schema::dropIfExists('reports');
     }
 };

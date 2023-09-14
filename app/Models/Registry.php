@@ -20,6 +20,11 @@ class Registry extends Model
 
     protected $dates = ['inAt', 'outAt'];
 
+    protected $casts = [
+        'inAt'  => 'datetime:c',
+        'outAt' => 'datetime:c',
+    ];
+
     public function car()
     {
         return $this->hasMany(Cars::class, 'id', 'carId');

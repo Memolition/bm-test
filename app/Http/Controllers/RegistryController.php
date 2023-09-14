@@ -7,6 +7,7 @@ use DateTime;
 use App\Models\Registry;
 use App\Http\Requests\StoreRegistryRequest;
 use App\Http\Requests\UpdateRegistryRequest;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class RegistryController extends Controller
@@ -31,11 +32,15 @@ class RegistryController extends Controller
 
         $inAt = empty($data['inAt']) ? new DateTime() : $data['inAt'];
 
-        $entity = new Registry;
-        $entity->inAt = $inAt;
-        $entity->carId = $data['carId'];
-        $entity->userId = $user->id;
-        $entity->save();
+        try {
+            $entity = new Registry;
+            $entity->inAt = $inAt;
+            $entity->carId = $data['carId'];
+            $entity->userId = $user->id;
+            $entity->save();
+        } catch(QueryException $e) {
+            return response(ApiError::entityNotFound('Car', $data['carId']), 400);
+        }
 
         return response()->json($entity);
     }
