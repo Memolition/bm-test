@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\CarCategoryController;
 use App\Http\Controllers\CarsController;
 use App\Http\Controllers\UsersController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,17 +21,15 @@ use Illuminate\Support\Facades\Route;
 Route::post('login', [UsersController::class, 'login']);
 Route::post('logout/{id}', [UsersController::class, 'logout']);
 
+Route::apiResource('user', UsersController::class)
+        ->only(['store']);
 
 /* Sanctum protected routes */
-/*
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:sanctum')->group(function() {
+    Route::apiResource('user', UsersController::class)
+        ->only(['index', 'show', 'destroy']);
+    
+    Route::apiResource('car', CarsController::class);
+
+    Route::apiResource('category', CarCategoryController::class);
 });
-*/
-
-Route::apiResource('user', UsersController::class)
-    ->only(['index', 'show', 'store', 'destroy'])
-    ->middleware('auth:sanctum');
-
-Route::resource('car', CarsController::class);
-
