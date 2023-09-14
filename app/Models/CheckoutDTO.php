@@ -1,12 +1,9 @@
 <?php
 namespace App\Models;
 
-class ReportEntryDTO {
+class CheckoutDTO {
     public $entry;
-    public $timeInDuringCycle;
-    public $totalTimeIn;
-
-    public $cycleCharges = 0;
+    public $timeIn = 0;
     public $totalCharges = 0;
     public $willCharge = false;
 }

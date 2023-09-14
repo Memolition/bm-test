@@ -7,6 +7,8 @@ use DateTime;
 use App\Models\Registry;
 use App\Http\Requests\StoreRegistryRequest;
 use App\Http\Requests\UpdateRegistryRequest;
+use App\Models\CheckoutDTO;
+use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
@@ -17,9 +19,11 @@ class RegistryController extends Controller
      */
     public function index()
     {
-        $registry = Registry::with("car")->get();
+        $registry = Registry::with("car.category")->get();
 
-        return response()->json($registry);
+        return response()->json($registry->map(function($entry) {
+            return $this->getCheckout($entry);
+        }));
     }
 
     /**
@@ -87,7 +91,28 @@ class RegistryController extends Controller
         $entry->outAt = new DateTime();
         $entry->save();
 
-        return response()->json($entry);
+        $checkout = $this->getCheckout($entry);
+
+        return response()->json($checkout);
+    }
+
+    private function getCheckout($entry) {
+        $checkout = new CheckoutDTO;
+        $checkout->entry = $entry;
+
+        if(!$entry->outAt) return $checkout;
+
+        $inDate = new Carbon($entry->inAt);
+        $outDate = new Carbon($entry->outAt);
+        $checkout->timeIn = $outDate->diffInMinutes($inDate);
+
+        // Calculate charge based on checkout minutes
+        // if category is set to be charged at checkout
+        $entryCategory = $entry->car->first()->category->first();
+        $checkout->willCharge = $entryCategory->chargedAt == config('constants.charged_at.checkout');
+        $checkout->totalCharges = number_format($checkout->timeIn * $entryCategory->chargePerMinute, 2, '.');
+
+        return $checkout;
     }
 
     /**

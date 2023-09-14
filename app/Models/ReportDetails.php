@@ -6,5 +6,5 @@ class ReportDetails {
     public $startDate;
     public $endDate;
     public $journal;
-    public $reports;
+    public $lastReport;
 }

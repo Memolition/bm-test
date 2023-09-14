@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Declarations\ApiError;
@@ -25,9 +24,9 @@ class ReportController extends Controller
     }
 
     private function calculateTotalParkingTime($report) {
-        $latestCycles = Report::orderBy('created_at', 'desc')->where('created_at', '<=', $report->created_at)->take(2)->get();
+        $latestCycle = Report::orderBy('created_at', 'desc')->where('created_at', '<', $report->created_at)->first();
 
-        $previousDate = count($latestCycles) == 2 ? $latestCycles[1]['created_at'] : new DateTime('2023-01-01T00:00:00');
+        $previousDate = $latestCycle->created_at ?? new DateTime('2023-01-01T00:00:00');
         
         $journalEntries = Registry::where(function ($q) use ($previousDate, $report) {
             $q->Where('outAt', '>', $previousDate)->where('inAt', '<=', $report->created_at);
@@ -38,23 +37,27 @@ class ReportController extends Controller
         $details = new ReportDetails;
         $details->startDate = $previousDate;
         $details->endDate = $report->created_at;
-        $details->journal = array_map(function($entry) use ($previousDate, $report) {
+        $details->journal = $journalEntries->map(function($entry) use ($previousDate, $report) {
             $cycleStartDate = Carbon::parse($previousDate);
             $cycleEndDate = Carbon::parse($report->created_at);
-            $entryInAtDate = Carbon::parse($entry['inAt']);
+            $entryInAtDate = Carbon::parse($entry->inAt);
 
-            $newVal = new ReportEntryDTO;
-            $newVal->entry = $entry;
+            $reportDetails = new ReportEntryDTO;
+            $reportDetails->entry = $entry;
 
             $entryStartDate = $entryInAtDate >= $cycleStartDate ? $entryInAtDate : $cycleStartDate;
 
-            $newVal->timeInDuringCycle =  $entryStartDate->diffInMinutes($cycleEndDate);
+            $reportDetails->timeInDuringCycle = $entryStartDate->diffInMinutes($cycleEndDate);
+            $reportDetails->totalTimeIn = ($entry->outAt == null || $entry->outAt > $cycleEndDate) ? $entryInAtDate->diffInMinutes(new Carbon($entry->outAt)) : $reportDetails->timeInDuringCycle;
 
-            $newVal->totalTimeIn = $entry["outAt"] != null ? $entryInAtDate->diffInMinutes(new Carbon()) : null;
+            $entryCategory = $entry->car->first()->category->first();
+            $reportDetails->willCharge = $entryCategory->chargedAt == config('constants.charged_at.cycle');
+            $reportDetails->cycleCharges = number_format($reportDetails->timeInDuringCycle * $entryCategory->chargePerMinute, 2, '.');
+            $reportDetails->totalCharges = number_format($reportDetails->totalTimeIn * $entryCategory->chargePerMinute, 2, '.');
 
-            return $newVal;
-        }, $journalEntries->toArray());
-        $details->reports = $latestCycles;
+            return $reportDetails;
+        });
+        $details->lastReport = $latestCycle;
 
         return response()->json($details);
     }
