@@ -8,14 +8,6 @@ use Illuminate\Foundation\Http\FormRequest;
 class StoreCarsRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
-     */
-    public function authorize(): bool
-    {
-        return false;
-    }
-
-    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
@@ -23,14 +15,16 @@ class StoreCarsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'plate' => 'required'
+            'plate' => 'required',
+            'categoryId' => 'required',
         ];
     }
 
     public function messages()
     {
         return [
-            'plate.required' => ApiError::fieldIsRequired('Plate')
+            'plate.required' => ApiError::fieldIsRequired('Plate'),
+            'categoryId.required' => ApiError::fieldIsRequired('categoryId'),
         ];
     }
 }

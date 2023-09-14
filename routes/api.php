@@ -29,7 +29,8 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::apiResource('user', UsersController::class)
         ->only(['index', 'show', 'destroy']);
     
-    Route::apiResource('car', CarsController::class);
-
+        
     Route::apiResource('category', CarCategoryController::class);
+    Route::apiResource('car', CarsController::class)
+        ->only(['index', 'store', 'show', 'destroy']);
 });

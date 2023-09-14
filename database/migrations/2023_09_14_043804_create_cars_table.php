@@ -15,8 +15,11 @@ return new class extends Migration
             $table->id();
 
             $table->string('plate')->unique()->nullable(false);
+            $table->unsignedBigInteger('categoryId');
+            $table->unsignedBigInteger('userId');
 
-            $table->softDeletes();
+            $table->foreign('userId')->references('id')->on('users');
+            $table->foreign('categoryId')->references('id')->on('car_categories');
             $table->timestamps();
         });
     }
@@ -26,6 +29,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('cars', function (Blueprint $table) {
+            $table->dropForeign('cars_users_userid_foreign');
+            $table->dropForeign('cars_car_categories_categoryid_foreign');
+        });
         Schema::dropIfExists('cars');
     }
 };

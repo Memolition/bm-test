@@ -48,9 +48,13 @@ class UsersController extends Controller
      */
     public function show($id)
     {
-        $user = User::find($id);
+        $entity = User::find($id);
 
-        return response()->json($user);
+        if(!$entity) {
+            return response(ApiError::entityNotFound('User', $id), 400);
+        }
+
+        return response()->json($entity);
     }
 
     /**
