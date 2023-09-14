@@ -35,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::apiResource('category', CarCategoryController::class);
     Route::apiResource('car', CarsController::class)
         ->only(['index', 'store', 'show', 'destroy']);
+    Route::get('search/{plate}', [CarsController::class, 'search']);
 
     Route::post('registry/checkout', [RegistryController::class, 'checkout']);
     Route::apiResource('registry', RegistryController::class)

@@ -56,6 +56,15 @@ class CarsController extends Controller
     }
 
     /**
+     * Search car by plate number
+     */
+    public function search($plate) {
+        $result = Cars::where('plate', 'like', "$plate%")->get();
+
+        return response()->json($result);
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(UpdateCarsRequest $request, Cars $cars)
