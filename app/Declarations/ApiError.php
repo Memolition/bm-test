@@ -27,6 +27,10 @@ class ApiError {
         return "$model $id couldn't be found.";
     }
 
+    static public function entryNotFound($plate) {
+        return "No open entry could be found for vehicle $plate";
+    }
+
     static public function invalidPassword($id) {
         return "Provided password for $id is invalid.";
     }

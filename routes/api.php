@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CarCategoryController;
 use App\Http\Controllers\CarsController;
+use App\Http\Controllers\RegistryController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,5 +33,9 @@ Route::middleware('auth:sanctum')->group(function() {
         
     Route::apiResource('category', CarCategoryController::class);
     Route::apiResource('car', CarsController::class)
+        ->only(['index', 'store', 'show', 'destroy']);
+
+    Route::post('registry/checkout', [RegistryController::class, 'checkout']);
+    Route::apiResource('registry', RegistryController::class)
         ->only(['index', 'store', 'show', 'destroy']);
 });

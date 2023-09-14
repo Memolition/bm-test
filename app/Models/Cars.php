@@ -11,5 +11,7 @@ class Cars extends Model
 
     protected $fillable = [
         'plate',
+        'categoryId',
+        'userId',
     ];
 }
