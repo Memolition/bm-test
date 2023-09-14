@@ -56,7 +56,7 @@ class UsersController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Users $users)
+    public function update(Request $request, User $users)
     {
         //
     }
@@ -103,7 +103,7 @@ class UsersController extends Controller
      */
     public function destroy($id)
     {
-        $entity = Users::find($id);
+        $entity = User::find($id);
 
         if(empty($entity)) {
             return response(ApiError::entityNotFound('User', $id), 400);
