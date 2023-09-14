@@ -68,7 +68,7 @@ class RegistryController extends Controller
     public function checkout(Request $request)
     {
         $plate = $request->input('plate');
-        $entry = Registry::whereHas('car', function ($query) use ($plate) {
+        $entry = Registry::with('car.category')->whereHas('car', function ($query) use ($plate) {
             return $query->where('plate', '=', $plate);
         })
         ->where("outAt", null)
