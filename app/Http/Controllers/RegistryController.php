@@ -116,6 +116,15 @@ class RegistryController extends Controller
     }
 
     /**
+     * Return all cars without outAt datetime
+     */
+    public function pending() {
+        $result = Registry::with('car')->whereNull('outAt')->get();
+
+        return response()->json($result);
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy($id)
